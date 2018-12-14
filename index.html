@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game</title>
+
+    <link href='https://fonts.googleapis.com/css?family=Orbitron' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="https://code.createjs.com/createjs-2015.05.21.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="js/Assets.js?version=6"></script>
+    <script src="js/game/AbstractGame.js?version=6"></script>
+    <script src="js/game/Shooter.js?version=6"></script>
+    <script src="js/ControlBoard.js?version=6"></script>
+    <script src="js/Player.js?version=6"></script>
+    <script src="js/Enemy.js?version=6"></script>
+    <script src="js/shootingSystems/PlayerShootingSystem.js?version=6"></script>
+    <script src="js/shootingSystems/UfoShooting.js?version=6"></script>
+    <script src="js/Weather.js?version=6"></script>
+    <script src="js/Info.js?version=6"></script>
+    <script src="js/Timer.js?version=6"></script>
+    <script src="js/Communicator.js?version=6"></script>
+    <script src="js/ScorePanel.js?version=6"></script>
+
+    <script>
+
+        "use strict";
+        var stage;
+        var queue;
+        var game;
+        var percentLoaded;
+
+        function init(){
+			console.log("init...");
+            stage = new createjs.Stage(document.getElementById("gameStage"));
+            queue = new createjs.LoadQueue(false);
+            var loading = new createjs.Text("Loading..." , "80px Orbitron" , "white");
+            var x = (1280/2) - (loading.getMeasuredWidth()/2);
+            var y = (720/2) - (loading.getMeasuredHeight()/2);
+            loading.x = x;
+            loading.y = y;
+            percentLoaded = new createjs.Text("" , "80px Orbitron" , "white");
+            percentLoaded.x = x+50;
+            percentLoaded.y = y+100;
+            var background = new createjs.Shape();
+            background.graphics.beginFill("black").drawRect(0,0,1280,720);
+            stage.addChild(background,loading,percentLoaded);
+            queue.installPlugin(createjs.Sound);
+            queue.on("complete", loadComplete);
+            queue.on("progress", handleProgress);
+            queue.loadManifest([
+                {id: "background", src:"images/land.jpg"},
+                {id: "result", src:"images/result.png"},
+                {id: "info", src:"images/info.jpg"},
+                {id: "soldier", src:"images/soldier.png"},
+                {id: "missile", src:"images/missile.png"},
+                {id: "laser", src:"images/laser.jpg"},
+                {id: "shield", src:"images/shield.png"},
+                {id: "shieldInfo", src:"images/shieldInfo.png"},
+                {id: "ufo", src:"images/ufo.png"},
+                {id: "ufofreeze", src:"images/ufofreeze.png"},
+                {id: "ufo3", src:"images/ufo3.png"},
+                {id: "ufo3freeze", src:"images/ufo3freeze.png"},
+                {id: "ufo6", src:"images/ufo6.png"},
+                {id: "ufo6freeze", src:"images/ufo6freeze.png"},
+                {id: "ufo10", src:"images/ufo10.png"},
+                {id: "ufo10freeze", src:"images/ufo10freeze.png"},
+                {id: "ammoBar", src:"images/ammoBar.png"},
+                {id: "ammoBarLaser", src:"images/ammoBarLaser.png"},
+                {id: "levelBar", src:"images/levelBar.png"},
+                {id: "healthBar", src:"images/healthBar.png"},
+                {id: "boom", src:"images/sheet.png"},
+                {id: "smoke", src:"images/smoke.png"},
+                {id: "cloud", src:"images/cloud.png"},
+                {id: "gameOver", src:"images/gameOver.png"},
+				{id: "gun", src:"images/gun.png"},
+                {id: "soundOn", src:"images/soundOn.png"},
+                {id: "soundOff", src:"images/soundOff.png"},
+                {id: "rocketSound", src:"sounds/rocket.ogg"},
+                {id: "laserSound", src:"sounds/laser.ogg"},
+                {id: "ufoLaserSound", src:"sounds/ufoLaserSound.ogg"},
+                {id: "backgroundMusic", src:"sounds/background.ogg"},
+                {id: "niceShooting", src:"sounds/niceShooting.ogg"},
+                {id: "bonus", src:"sounds/bonus.ogg"},
+                {id: "xFiles", src:"sounds/xFiles.ogg"},
+                {id: "explode", src:"sounds/explode.ogg"}
+            ]);
+        }
+
+        function handleProgress(event){
+            percentLoaded.text = Math.round(event.progress* 100) + " %";
+            stage.update();
+        }
+
+        function loadComplete() {
+            console.log("complete");
+            stage.removeAllChildren();
+            percentLoaded = null;
+            game = new system.ShooterGame();
+            stage.addChild(game);
+            console.log("Load Complete");
+            setupStage();
+        }
+
+        function setupStage(){
+            console.log("setup");
+            createjs.Ticker.timingMode = createjs.Ticker.RAF;
+            createjs.Ticker.addEventListener("tick", function(){
+                //console.log("num = " + game.getNumChildren());
+                game.render();
+            });
+        }
+
+        function resize(){
+            $("#gameStage").outerHeight($(window).height()-$("#gameStage").offset().top- Math.abs($("#gameStage").outerHeight(true) - $("#gameStage").outerHeight()));
+        }
+        $(document).ready(function(){
+            resize();
+            $(window).on("resize", function(){
+                resize();
+            });
+        });
+
+    </script>
+
+</head>
+<body onload="init();" oncontextmenu= "return false">
+<div class="container">
+<canvas id="gameStage" width="1280" height="720"></canvas>
+</div>
+</body>
+</html>
